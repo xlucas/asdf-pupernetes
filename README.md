@@ -1,7 +1,5 @@
 # asdf-pupernetes
 
-[![Build Status](https://travis-ci.org/xlucas/asdf-pupernetes.svg?branch=master)](https://travis-ci.org/xlucas/asdf-pupernetes)
-
 [Pupernetes](https://github.com/DataDog/pupernetes) plugin for [asdf](https://github.com/asdf-vm/asdf) version manager
 
 ## Install
