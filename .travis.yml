@@ -6,4 +6,4 @@ before_script:
   - git clone https://github.com/asdf-vm/asdf.git
   - . asdf/asdf.sh
 script:
-  - asdf plugin-test helm https://github.com/xlucas/asdf-pupernetes.git
+  - asdf plugin-test asdf https://github.com/xlucas/asdf-pupernetes.git
