@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+set \
+    -o errexit \
+    -o nounset \
+    -o pipefail
+
+# required environment variables
+: ${ASDF_INSTALL_TYPE?}
+: ${ASDF_INSTALL_VERSION?}
+: ${ASDF_INSTALL_PATH?}
+
+readonly repository="DataDog/pupernetes"
+readonly toolname="pupernetes"
+
+# make a temporary download directory with a cleanup hook
+readonly TMP_DOWNLOAD_DIR="$(mktemp -d -t "asdf_${toolname}_XXXXXX")"
+trap 'rm -rf "${TMP_DOWNLOAD_DIR?}"' EXIT
+
+install() {
+    local -r install_type="$1"
+    local -r version="$2"
+    local -r install_path="$3"
+
+    local -r bin_install_path="${install_path}/bin"
+    local -r binary_install_path="${bin_install_path}/$toolname"
+    local -r download_url="https://github.com/DataDog/pupernetes/releases/download/v$version/pupernetes"
+    local -r download_path="${TMP_DOWNLOAD_DIR}/$(basename "${download_url}")"
+
+    local -r arch="$(get_arch)"
+
+    if [[ $arch != "linux" ]]; then
+        echo "Error: ${toolname} only supports linux"
+        exit 1
+    fi
+
+    echo "Downloading ${toolname} version ${version} from ${download_url}"
+    if curl -fsL ${download_url} -o "${download_path}"; then
+        echo "Cleaning previous binaries"
+        rm -rf "${bin_install_path}/${toolname}"
+
+        echo "Creating bin directory"
+        mkdir -p "${bin_install_path}"
+
+        echo "Copying binary"
+        cp ${download_path} ${binary_install_path}
+        chmod +x ${binary_install_path}
+    else
+        echo "Error: ${toolname} version ${version} not found" >&2
+        exit 1
+    fi
+}
+
+get_arch() {
+    uname | tr '[:upper:]' '[:lower:]'
+}
+
+install "${ASDF_INSTALL_TYPE}" "${ASDF_INSTALL_VERSION}" "${ASDF_INSTALL_PATH}"
